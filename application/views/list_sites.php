@@ -1,5 +1,6 @@
 <div id="page-wrapper">
     <div class="container-fluid">
+
         <!-- Page Heading -->
         <div class="row">
             <div class="col-lg-12">
@@ -13,6 +14,7 @@
                 </ol>
             </div>
         </div>
+        <!-- /.row -->
 
         <!-- Alert Info -->
         <div class="row">
@@ -23,6 +25,7 @@
                 </div>
             </div>
         </div>
+        <!-- /.row -->
 
         <!-- Site Table Panel -->
         <div class="row">
@@ -58,7 +61,7 @@
                                             <td><?php echo $site['vlan_id']; ?></td>
                                             <td>
                                                 <!-- Tombol untuk membuka modal dengan iframe -->
-                                                <a href="javascript:void(0);" onclick="loadIframe('<?php echo base_url($site['graph']); ?>');" class="btn btn-info btn-sm">
+                                                <a href="javascript:void(0);" onclick="loadIframe('<?php echo $site['graph']; ?>');" class="btn btn-info btn-sm">
                                                     <i class="fa fa-bar-chart-o"></i> View
                                                 </a>
                                                 <a href="<?php echo site_url('site/edit/'.$site['id']); ?>" class="btn btn-warning btn-sm">Edit</a>
@@ -73,13 +76,16 @@
                 </div>
             </div>
         </div>
+        <!-- /.row -->
 
     </div>
+    <!-- /.container-fluid -->
 </div>
+<!-- /#page-wrapper -->
 
 <!-- Modal untuk menampilkan iframe -->
 <div class="modal fade" id="iframeModal" tabindex="-1" role="dialog" aria-labelledby="iframeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="iframeModalLabel">View Details</h5>
@@ -88,14 +94,19 @@
                 </button>
             </div>
             <div class="modal-body">
-                <iframe id="iframe-content" src="" title="Embedded Content"></iframe>
+                <iframe id="iframe-content" src="" title="Embedded Content" width="850" height="600"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
-    <script>
-        function loadIframe(url) {
-            document.getElementById('iframe-content').src = url;
+<script>
+        // Fungsi untuk mengubah src dari iframe di dalam modal
+        function loadIframe(graphPath) {
+            const baseUrl = "http://monitor.puskomedia.net.id"; // URL dasar
+            document.getElementById('iframe-content').src = baseUrl + graphPath;
             $('#iframeModal').modal('show'); // Membuka modal
         }
     </script>

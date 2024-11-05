@@ -12,13 +12,17 @@ class User extends CI_Controller {
     // Menampilkan semua pengguna
     public function index() {
         $data['users'] = $this->UserModel->getAllUsers();
+        $this->load->view('templates/header');
         $this->load->view('list_users', $data);
+        $this->load->view('templates/footer');
     }
 
     // Menampilkan form create user
     public function create() {
         $data['roles'] = $this->RoleModel->getAllRoles();
+        $this->load->view('templates/header');
         $this->load->view('create_user', $data);
+        $this->load->view('templates/footer');
     }
 
     // Menyimpan pengguna baru
@@ -36,7 +40,9 @@ class User extends CI_Controller {
     public function edit($id) {
         $data['user'] = $this->UserModel->getUserById($id);
         $data['roles'] = $this->RoleModel->getAllRoles();
+        $this->load->view('templates/header');
         $this->load->view('edit_user', $data);
+        $this->load->view('templates/footer');
     }
 
     // Memperbarui data pengguna

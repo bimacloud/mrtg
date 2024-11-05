@@ -11,12 +11,16 @@ class Role extends CI_Controller {
     // Menampilkan semua role
     public function index() {
         $data['roles'] = $this->RoleModel->getAllRoles();
+        $this->load->view('templates/header');
         $this->load->view('list_roles', $data);
+        $this->load->view('templates/footer');
     }
 
     // Menampilkan form create role
     public function create() {
+        $this->load->view('templates/header');
         $this->load->view('create_role');
+        $this->load->view('templates/footer');
     }
 
     // Menyimpan role baru
@@ -31,7 +35,9 @@ class Role extends CI_Controller {
     // Menampilkan form edit role
     public function edit($id) {
         $data['role'] = $this->RoleModel->getRoleById($id);
+        $this->load->view('templates/header');
         $this->load->view('edit_role', $data);
+        $this->load->view('templates/footer');
     }
 
     // Memperbarui data role
