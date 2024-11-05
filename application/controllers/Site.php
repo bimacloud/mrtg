@@ -77,22 +77,15 @@ class Site extends CI_Controller {
 }
 
 
-    // Fungsi untuk menyimpan konfigurasi ke file .cfg
-    public function save_config($id) {
-        // Ambil data site dan role pengguna dari model
+      public function save_config($id) {
         $site = $this->SiteModel->get_site_by_id($id);
         $username = $site['username'];
-        $role = $site['role_name']; // Asumsikan 'role_name' disimpan di site data
+        $role_id = $site['role_id']; // Dapatkan role_id dari tabel user
 
-        // Ambil input dari form
-        $oid = $this->input->post('oid');
-        $snmp_community = $this->input->post('snmp_community');
-        $ip_address = $this->input->post('ip_address');
-
-        // Tentukan direktori penyimpanan berdasarkan role
-        if ($role == 'reseller') {
+        // Tentukan direktori berdasarkan role_id
+        if ($role_id == 3) { // Reseller
             $directory = '/etc/site/reseller';
-        } elseif ($role == 'pop') {
+        } elseif ($role_id == 2) { // User (POP)
             $directory = '/etc/site/pop';
         } else {
             $this->session->set_flashdata('error', 'Invalid role for configuration.');
@@ -102,10 +95,13 @@ class Site extends CI_Controller {
 
         // Pastikan direktori ada atau buat jika belum ada
         if (!is_dir($directory)) {
-            mkdir($directory, 0755, true);
+            if (!mkdir($directory, 0755, true)) {
+                $this->session->set_flashdata('error', 'Failed to create directory.');
+                redirect('site');
+                return;
+            }
         }
 
-        // Buat konten file konfigurasi
         $config_content = "EnableIPv6: no\n";
         $config_content .= "WorkDir: /var/www/html/{$role}/{$username}\n";
         $config_content .= "Options[_]: growright,bits,transparent,nobanner,nolegend\n";
@@ -118,17 +114,16 @@ class Site extends CI_Controller {
         $config_content .= "PageTop[{$username}]: <H1>{$username}</H1>\n";
         $config_content .= "######\n";
 
-        // Tentukan path file berdasarkan role dan username
         $file_path = "{$directory}/{$username}.cfg";
 
         // Tulis ke file konfigurasi
-        if (file_put_contents($file_path, $config_content)) {
-            $this->session->set_flashdata('success', 'Configuration file created successfully.');
-        } else {
+        if (file_put_contents($file_path, $config_content) === false) {
             $this->session->set_flashdata('error', 'Failed to create configuration file.');
+        } else {
+            $this->session->set_flashdata('success', 'Configuration file created successfully.');
         }
 
-        // Redirect kembali ke halaman site
         redirect('site');
     }
+
 }

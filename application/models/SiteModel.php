@@ -33,9 +33,14 @@ class SiteModel extends CI_Model {
         return $this->db->delete('site');
     }
     public function get_site_by_id($id) {
-    // Ambil semua data dari tabel site berdasarkan ID
-        $query = $this->db->get_where('site', array('id' => $id));
+        $this->db->select('site.*, user.role_id, user.username'); // Ambil kolom role_id dan username dari tabel user
+        $this->db->from('site');
+        $this->db->join('user', 'site.user_id = user.id', 'left'); // Join dengan tabel user
+        $this->db->where('site.id', $id);
+        $query = $this->db->get();
+
         return $query->row_array();
     }
+
 
 }

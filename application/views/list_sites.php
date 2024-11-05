@@ -1,7 +1,20 @@
-
-
 <div id="page-wrapper">
     <div class="container-fluid">
+
+        <!-- Tampilkan Pesan Flash -->
+        <?php if ($this->session->flashdata('error')): ?>
+            <div class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?php echo $this->session->flashdata('error'); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($this->session->flashdata('success')): ?>
+            <div class="alert alert-success alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?php echo $this->session->flashdata('success'); ?>
+            </div>
+        <?php endif; ?>
 
         <!-- Page Heading -->
         <div class="row">
@@ -66,7 +79,6 @@
                                                 <a href="<?php echo site_url('site/edit/'.$site['id']); ?>" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> Edit</a>
                                                 <a href="<?php echo site_url('site/delete/'.$site['id']); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i> Delete</a>
                                                 <a href="<?php echo site_url('site/config/'.$site['id']); ?>" class="btn btn-secondary btn-sm"><i class="fa fa-cog"></i> Config</a>
-
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -83,4 +95,3 @@
     <!-- /.container-fluid -->
 </div>
 <!-- /#page-wrapper -->
-
