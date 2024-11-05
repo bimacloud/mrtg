@@ -3,6 +3,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class SiteModel extends CI_Model {
 
+     public function __construct() {
+        parent::__construct();
+        $this->load->database(); // Pastikan database telah di-load
+    }
+
     public function getAllSites() {
         $this->db->select('site.*, user.username');
         $this->db->from('site');
@@ -27,4 +32,10 @@ class SiteModel extends CI_Model {
         $this->db->where('id', $id);
         return $this->db->delete('site');
     }
+    public function get_site_by_id($id) {
+    // Ambil semua data dari tabel site berdasarkan ID
+        $query = $this->db->get_where('site', array('id' => $id));
+        return $query->row_array();
+    }
+
 }

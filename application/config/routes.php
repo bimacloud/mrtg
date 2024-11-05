@@ -81,3 +81,5 @@ $route['site/save'] = 'site/save';
 $route['site/edit/(:num)'] = 'site/edit/$1';
 $route['site/update/(:num)'] = 'site/update/$1';
 $route['site/delete/(:num)'] = 'site/delete/$1';
+$route['site/config/(:num)'] = 'site/config/$1';
+$route['site/save_config/(:num)'] = 'site/save_config/$1';
