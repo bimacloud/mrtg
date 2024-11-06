@@ -227,8 +227,11 @@ public function generate_index($id) {
     }
 
     // Perintah untuk menjalankan indexmaker dan menyimpan output ke index.html
-    $command = "sudo /usr/bin/indexmaker " . escapeshellarg($config_path) . " > " . escapeshellarg("{$output_directory}/index.html");
+    $command = "sudo /usr/bin/indexmaker " . escapeshellarg($config_path) . " > " . escapeshellarg("{$output_directory}/index.html") . " 2>&1";
     $output = shell_exec($command);
+
+    // Debugging output
+    error_log("IndexMaker command output: " . $output);
 
     // Cek apakah file index.html berhasil dibuat
     if (file_exists("{$output_directory}/index.html")) {
