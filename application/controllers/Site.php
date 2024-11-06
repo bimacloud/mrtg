@@ -192,52 +192,54 @@ class Site extends CI_Controller {
         // Kembali ke halaman konfigurasi dengan pesan flashdata
         redirect('site/config_mrtg/' . $id);
     }
-    public function generate_index($id) {
-        // Ambil data site berdasarkan ID
-        $site = $this->SiteModel->get_site_by_id($id);
+public function generate_index($id) {
+    // Ambil data site berdasarkan ID
+    $site = $this->SiteModel->get_site_by_id($id);
 
-        if (!$site) {
-            $this->session->set_flashdata('error', 'Site not found.');
-            redirect('site/config_mrtg/' . $id);
-            return;
-        }
-
-        // Tentukan direktori output dan path file konfigurasi
-        $username = $site['username'];
-        $role_id = $site['role_id'];
-        $config_path = "/etc/site/{$username}.cfg";
-        $output_directory = "";
-
-        if ($role_id == 3) { // Reseller
-            $output_directory = "/var/www/html/reseller/{$username}";
-        } elseif ($role_id == 2) { // POP
-            $output_directory = "/var/www/html/pop/{$username}";
-        } else {
-            $this->session->set_flashdata('error', 'Invalid role for index generation.');
-            redirect('site/config_mrtg/' . $id);
-            return;
-        }
-
-        // Pastikan direktori output sudah ada
-        if (!is_dir($output_directory)) {
-            mkdir($output_directory, 0755, true);
-        }
-
-        // Perintah untuk menjalankan indexmaker dan menyimpan output ke index.html
-        $command = "sudo /usr/bin/indexmaker " . escapeshellarg($config_path) . " > " . escapeshellarg("{$output_directory}/index.html");
-        $output = shell_exec($command);
-
-        // Cek apakah file index.html berhasil dibuat
-        if (file_exists("{$output_directory}/index.html")) {
-            $this->session->set_flashdata('success', 'Index file created successfully.');
-        } else {
-            error_log("Failed to create index file: " . $output);
-            $this->session->set_flashdata('error', 'Failed to create index file.');
-        }
-
-        // Kembali ke halaman konfigurasi dengan pesan flashdata
+    if (!$site) {
+        $this->session->set_flashdata('error', 'Site not found.');
         redirect('site/config_mrtg/' . $id);
+        return;
     }
 
+    // Tentukan direktori output dan path file konfigurasi
+    $username = $site['username'];
+    $role_id = $site['role_id'];
+    $config_path = "";
+    $output_directory = "";
+
+    // Sesuaikan config_path dan output_directory berdasarkan role
+    if ($role_id == 3) { // Reseller
+        $config_path = "/etc/site/reseller/{$username}.cfg";
+        $output_directory = "/var/www/html/reseller/{$username}";
+    } elseif ($role_id == 2) { // POP
+        $config_path = "/etc/site/pop/{$username}.cfg";
+        $output_directory = "/var/www/html/pop/{$username}";
+    } else {
+        $this->session->set_flashdata('error', 'Invalid role for index generation.');
+        redirect('site/config_mrtg/' . $id);
+        return;
+    }
+
+    // Pastikan direktori output sudah ada
+    if (!is_dir($output_directory)) {
+        mkdir($output_directory, 0755, true);
+    }
+
+    // Perintah untuk menjalankan indexmaker dan menyimpan output ke index.html
+    $command = "sudo /usr/bin/indexmaker " . escapeshellarg($config_path) . " > " . escapeshellarg("{$output_directory}/index.html");
+    $output = shell_exec($command);
+
+    // Cek apakah file index.html berhasil dibuat
+    if (file_exists("{$output_directory}/index.html")) {
+        $this->session->set_flashdata('success', 'Index file created successfully.');
+    } else {
+        error_log("Failed to create index file: " . $output);
+        $this->session->set_flashdata('error', 'Failed to create index file.');
+    }
+
+    // Kembali ke halaman konfigurasi dengan pesan flashdata
+    redirect('site/config_mrtg/' . $id);
+}
 
 }
