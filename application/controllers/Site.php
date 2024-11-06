@@ -244,55 +244,55 @@ class Site extends CI_Controller {
         // Kembali ke halaman konfigurasi dengan pesan flashdata
         redirect('site/config_mrtg/' . $id);
     }
-    public function run_mrtg($id) {
-        // Ambil data site berdasarkan ID
-        $site = $this->SiteModel->get_site_by_id($id);
+public function run_mrtg($id) {
+    // Ambil data site berdasarkan ID
+    $site = $this->SiteModel->get_site_by_id($id);
 
-        if (!$site) {
-            $this->session->set_flashdata('error', 'Site not found.');
-            redirect('site/config_mrtg/' . $id);
-            return;
-        }
-
-        $username = $site['username'];
-        $role_id = $site['role_id'];
-        $config_path = "";
-        $log_path = "";
-
-        // Tentukan path file konfigurasi dan log berdasarkan role
-        if ($role_id == 3) { // Reseller
-            $config_path = "/etc/site/reseller/{$username}.cfg";
-            $log_path = "/var/log/reseller/{$username}.log";
-        } elseif ($role_id == 2) { // POP
-            $config_path = "/etc/site/pop/{$username}.cfg";
-            $log_path = "/var/log/pop/{$username}.log";
-        } else {
-            $this->session->set_flashdata('error', 'Invalid role for running MRTG.');
-            redirect('site/config_mrtg/' . $id);
-            return;
-        }
-
-        // Pastikan direktori log ada
-        $log_directory = dirname($log_path);
-        if (!is_dir($log_directory)) {
-            mkdir($log_directory, 0755, true);
-        }
-
-        // Perintah untuk menjalankan MRTG
-        $command = "env LANG=C mrtg " . escapeshellarg($config_path) . " --logging " . escapeshellarg($log_path) . " 2>&1";
-        $output = shell_exec($command);
-
-        // Cek apakah MRTG berhasil dijalankan dan tampilkan pesan
-        if (strpos($output, "ERROR") === false) {
-            $this->session->set_flashdata('success', 'MRTG ran successfully.');
-        } else {
-            error_log("Failed to run MRTG: " . $output);
-            $this->session->set_flashdata('error', 'Failed to run MRTG. Check server logs for details.');
-        }
-
-        // Kembali ke halaman konfigurasi dengan pesan flashdata
+    if (!$site) {
+        $this->session->set_flashdata('error', 'Site not found.');
         redirect('site/config_mrtg/' . $id);
+        return;
     }
+
+    $username = $site['username'];
+    $role_id = $site['role_id'];
+    $config_path = "";
+    $log_path = "";
+
+    // Tentukan path file konfigurasi dan log berdasarkan role
+    if ($role_id == 3) { // Reseller
+        $config_path = "/etc/site/reseller/{$username}.cfg";
+        $log_path = "/var/log/reseller/{$username}.log";
+    } elseif ($role_id == 2) { // POP
+        $config_path = "/etc/site/pop/{$username}.cfg";
+        $log_path = "/var/log/pop/{$username}.log";
+    } else {
+        $this->session->set_flashdata('error', 'Invalid role for running MRTG.');
+        redirect('site/config_mrtg/' . $id);
+        return;
+    }
+
+    // Pastikan direktori log ada
+    $log_directory = dirname($log_path);
+    if (!is_dir($log_directory)) {
+        mkdir($log_directory, 0755, true);
+    }
+
+    // Perintah untuk menjalankan MRTG sebagai root
+    $command = "sudo -u root env LANG=C mrtg " . escapeshellarg($config_path) . " --logging " . escapeshellarg($log_path) . " 2>&1";
+    $output = shell_exec($command);
+
+    // Cek apakah MRTG berhasil dijalankan dan tampilkan pesan
+    if (strpos($output, "ERROR") === false) {
+        $this->session->set_flashdata('success', 'MRTG ran successfully.');
+    } else {
+        error_log("Failed to run MRTG: " . $output);
+        $this->session->set_flashdata('error', 'Failed to run MRTG. Check server logs for details.');
+    }
+
+    // Kembali ke halaman konfigurasi dengan pesan flashdata
+    redirect('site/config_mrtg/' . $id);
+}
 
 
 }
