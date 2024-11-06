@@ -218,8 +218,13 @@ class Site extends CI_Controller {
             return;
         }
 
+        // Pastikan direktori output sudah ada
+        if (!is_dir($output_directory)) {
+            mkdir($output_directory, 0755, true);
+        }
+
         // Perintah untuk menjalankan indexmaker dan menyimpan output ke index.html
-        $command = "sudo indexmaker " . escapeshellarg($config_path) . " > " . escapeshellarg("{$output_directory}/index.html");
+        $command = "sudo /usr/bin/indexmaker " . escapeshellarg($config_path) . " > " . escapeshellarg("{$output_directory}/index.html");
         $output = shell_exec($command);
 
         // Cek apakah file index.html berhasil dibuat
