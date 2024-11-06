@@ -16,6 +16,13 @@
             </div>
         <?php endif; ?>
 
+        <?php if ($this->session->flashdata('info')): ?>
+            <div class="alert alert-info alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?php echo nl2br($this->session->flashdata('info')); ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Page Heading -->
         <div class="row">
             <div class="col-lg-12">
@@ -63,19 +70,6 @@
 
                             <dt>Layanan ID:</dt>
                             <dd><?php echo htmlspecialchars($site['layanan_id']); ?></dd>
-
-                            <!-- Tampilkan Status File Konfigurasi -->
-                            <dt>Configuration File Status:</dt>
-                            <dd>
-                                <?php
-                                $file_path = "/etc/site/" . (($site['role_id'] == 3) ? "reseller" : "pop") . "/" . $site['username'] . ".cfg";
-                                if (file_exists($file_path)) {
-                                    echo "<span class='text-success'>Configuration file exists</span>";
-                                } else {
-                                    echo "<span class='text-danger'>Configuration file not created</span>";
-                                }
-                                ?>
-                            </dd>
                         </dl>
                     </div>
                 </div>
@@ -94,25 +88,19 @@
                         <a href="<?php echo site_url('site/generate_config/' . $site['id']); ?>" class="btn btn-primary">
                             <i class="fa fa-cog"></i> Generate Configuration File
                         </a>
-                        
                         <a href="<?php echo site_url('site/create_folder/' . $site['id']); ?>" class="btn btn-success">
                             <i class="fa fa-folder"></i> Create Folder
                         </a>
-                        
-                        <!-- Tombol Generate Index -->
                         <a href="<?php echo site_url('site/generate_index/' . $site['id']); ?>" class="btn btn-info">
-                            <i class="fa fa-file"></i> Generate Index
+                            <i class="fa fa-file"></i> IndexMaker
                         </a>
-                         <!-- Tombol Run MRTG -->
                         <a href="<?php echo site_url('site/run_mrtg/' . $site['id']); ?>" class="btn btn-warning">
                             <i class="fa fa-play"></i> Run MRTG
                         </a>
-
                         <a href="<?php echo site_url('site'); ?>" class="btn btn-default">
                             <i class="fa fa-arrow-left"></i> Back to Site Management
                         </a>
                     </div>
-
                 </div>
             </div>
         </div>

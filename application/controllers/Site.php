@@ -279,6 +279,15 @@ class Site extends CI_Controller {
 
     if (strpos($output, 'ERROR') === false) {
         $this->session->set_flashdata('success', 'MRTG ran successfully.');
+
+        // Tambahkan pesan flash untuk konfigurasi crontab
+        if ($role_id == 3) { // Reseller
+            $crontab_entry = "*/1 * * * * env LANG=C mrtg /etc/site/reseller/{$username}.cfg --logging /var/log/mrtg/reseller/{$username}.log";
+        } elseif ($role_id == 2) { // POP
+            $crontab_entry = "*/1 * * * * env LANG=C mrtg /etc/site/pop/{$username}.cfg --logging /var/log/mrtg/pop/{$username}.log";
+        }
+        
+        $this->session->set_flashdata('info', "You can add the following crontab entry to run MRTG every minute:\n" . $crontab_entry);
     } else {
         error_log("MRTG run error: " . $output);
         $this->session->set_flashdata('error', 'Failed to run MRTG. Check server logs for details.');
