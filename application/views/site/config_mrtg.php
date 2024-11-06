@@ -103,6 +103,10 @@
                         <a href="<?php echo site_url('site/generate_index/' . $site['id']); ?>" class="btn btn-info">
                             <i class="fa fa-file"></i> Generate Index
                         </a>
+                         <!-- Tombol Run MRTG -->
+                        <a href="<?php echo site_url('site/run_mrtg/' . $site['id']); ?>" class="btn btn-warning">
+                            <i class="fa fa-play"></i> Run MRTG
+                        </a>
 
                         <a href="<?php echo site_url('site'); ?>" class="btn btn-default">
                             <i class="fa fa-arrow-left"></i> Back to Site Management
