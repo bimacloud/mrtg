@@ -1,61 +1,110 @@
-
 <div id="page-wrapper">
     <div class="container-fluid">
+
+        <!-- Tampilkan Pesan Flash -->
+        <?php if ($this->session->flashdata('error')): ?>
+            <div class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?php echo $this->session->flashdata('error'); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($this->session->flashdata('success')): ?>
+            <div class="alert alert-success alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?php echo $this->session->flashdata('success'); ?>
+            </div>
+        <?php endif; ?>
 
         <!-- Page Heading -->
         <div class="row">
             <div class="col-lg-12">
-               <h1 class="page-header">
-                    Configure MRTG for <?php echo isset($site['username']) ? $site['username'] : 'Unknown'; ?>
+                <h1 class="page-header">
+                    MRTG Configuration <small>Details for Site</small>
                 </h1>
-
                 <ol class="breadcrumb">
                     <li>
                         <i class="fa fa-dashboard"></i> <a href="<?php echo site_url('site'); ?>">Site Management</a>
                     </li>
                     <li class="active">
-                        <i class="fa fa-cog"></i> Configure MRTG
+                        <i class="fa fa-cog"></i> Configuration
                     </li>
                 </ol>
             </div>
         </div>
         <!-- /.row -->
 
-        <!-- Form Konfigurasi MRTG -->
+        <!-- Site Configuration Info -->
         <div class="row">
             <div class="col-lg-12">
-                <form action="<?php echo site_url('site/save_config/'.$site['id']); ?>" method="post" class="form-horizontal">
-                    <div class="form-group">
-                        <label for="oid" class="col-sm-2 control-label">OID</label>
-                        <div class="col-sm-10">
-                            <input type="text" name="oid" id="oid" class="form-control" required>
-                            <small class="form-text text-muted">Masukkan OID yang digunakan untuk target MRTG.</small>
-                        </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-info-circle"></i> Site Configuration Details</h3>
                     </div>
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            <dt>Username:</dt>
+                            <dd><?php echo htmlspecialchars($site['username']); ?></dd>
 
-                    <div class="form-group">
-                        <label for="snmp_community" class="col-sm-2 control-label">SNMP Community</label>
-                        <div class="col-sm-10">
-                            <input type="text" name="snmp_community" id="snmp_community" class="form-control" required>
-                            <small class="form-text text-muted">Masukkan SNMP Community untuk akses ke target.</small>
-                        </div>
-                    </div>
+                            <dt>OID:</dt>
+                            <dd><?php echo htmlspecialchars($site['oid']); ?></dd>
 
-                    <div class="form-group">
-                        <label for="ip_address" class="col-sm-2 control-label">IP Address</label>
-                        <div class="col-sm-10">
-                            <input type="text" name="ip_address" id="ip_address" class="form-control" required>
-                            <small class="form-text text-muted">Masukkan IP Address dari target.</small>
-                        </div>
-                    </div>
+                            <dt>SNMP Community:</dt>
+                            <dd><?php echo htmlspecialchars($site['snmp_community']); ?></dd>
 
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-primary">Save Configuration</button>
-                            <a href="<?php echo site_url('site'); ?>" class="btn btn-default">Cancel</a>
-                        </div>
+                            <dt>IP Address:</dt>
+                            <dd><?php echo htmlspecialchars($site['ip_address']); ?></dd>
+
+                            <dt>VLAN ID:</dt>
+                            <dd><?php echo htmlspecialchars($site['vlan_id']); ?></dd>
+
+                            <dt>Graph Path:</dt>
+                            <dd><?php echo htmlspecialchars($site['graph']); ?></dd>
+
+                            <dt>Layanan ID:</dt>
+                            <dd><?php echo htmlspecialchars($site['layanan_id']); ?></dd>
+
+                            <!-- Tampilkan Status File Konfigurasi -->
+                            <dt>Configuration File Status:</dt>
+                            <dd>
+                                <?php
+                                $file_path = "/etc/site/" . (($site['role_id'] == 3) ? "reseller" : "pop") . "/" . $site['username'] . ".cfg";
+                                if (file_exists($file_path)) {
+                                    echo "<span class='text-success'>Configuration file exists</span>";
+                                } else {
+                                    echo "<span class='text-danger'>Configuration file not created</span>";
+                                }
+                                ?>
+                            </dd>
+                        </dl>
                     </div>
-                </form>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <!-- Configuration Actions -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-wrench"></i> Configuration Actions</h3>
+                    </div>
+                    <div class="panel-body">
+                        <a href="<?php echo site_url('site/generate_config/' . $site['id']); ?>" class="btn btn-primary">
+                            <i class="fa fa-cog"></i> Generate Configuration File
+                        </a>
+                        
+                        <!-- Tombol Create Folder -->
+                        <a href="<?php echo site_url('site/create_folder/' . $site['id']); ?>" class="btn btn-success">
+                            <i class="fa fa-folder"></i> Create Folder
+                        </a>
+
+                        <a href="<?php echo site_url('site'); ?>" class="btn btn-default">
+                            <i class="fa fa-arrow-left"></i> Back to Site Management
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- /.row -->
@@ -64,4 +113,3 @@
     <!-- /.container-fluid -->
 </div>
 <!-- /#page-wrapper -->
-

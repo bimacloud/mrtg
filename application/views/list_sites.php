@@ -78,7 +78,7 @@
                                                 <a href="javascript:void(0);" onclick="loadIframe('<?php echo $site['graph']; ?>');" class="btn btn-info btn-sm"><i class="fa fa-bar-chart-o"></i> View</a>
                                                 <a href="<?php echo site_url('site/edit/'.$site['id']); ?>" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> Edit</a>
                                                 <a href="<?php echo site_url('site/delete/'.$site['id']); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i> Delete</a>
-                                                <a href="<?php echo site_url('site/config/'.$site['id']); ?>" class="btn btn-secondary btn-sm"><i class="fa fa-cog"></i> Config</a>
+                                                <a href="<?php echo site_url('site/generate_config/'.$site['id']); ?>" class="btn btn-default btn-sm"><i class="fa fa-cog"></i> Config</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -95,3 +95,32 @@
     <!-- /.container-fluid -->
 </div>
 <!-- /#page-wrapper -->
+
+<!-- Modal untuk menampilkan iframe Graph -->
+<div class="modal fade" id="iframeModal" tabindex="-1" role="dialog" aria-labelledby="iframeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="iframeModalLabel">Graph View</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe id="iframe-content" src="" title="Embedded Graph" width="100%" height="600"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fungsi untuk mengubah src iframe dan membuka modal
+    function loadIframe(graphPath) {
+        const baseUrl = "http://monitor.puskomedia.net.id"; // URL dasar
+        document.getElementById('iframe-content').src = baseUrl + graphPath;
+        $('#iframeModal').modal('show'); // Buka modal
+    }
+</script>

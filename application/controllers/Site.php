@@ -19,7 +19,7 @@ class Site extends CI_Controller {
 
     // Menampilkan form create site
     public function create() {
-        $data['users'] = $this->UserModel->getAllUsers(); // Mendapatkan daftar user
+        $data['users'] = $this->UserModel->getAllUsers();
         $this->load->view('templates/header');
         $this->load->view('create_site', $data);
         $this->load->view('templates/footer');
@@ -32,8 +32,11 @@ class Site extends CI_Controller {
             'layanan_id' => $this->input->post('layanan_id'),
             'graph' => $this->input->post('graph'),
             'ip_address' => $this->input->post('ip_address'),
-            'vlan_id' => $this->input->post('vlan_id')
+            'vlan_id' => $this->input->post('vlan_id'),
+            'oid' => $this->input->post('oid'),              
+            'snmp_community' => $this->input->post('snmp_community')
         );
+        
         $this->SiteModel->saveSite($data);
         redirect('site');
     }
@@ -41,7 +44,7 @@ class Site extends CI_Controller {
     // Menampilkan form edit site
     public function edit($id) {
         $data['site'] = $this->SiteModel->getSiteById($id);
-        $data['users'] = $this->UserModel->getAllUsers(); // Mendapatkan daftar user
+        $data['users'] = $this->UserModel->getAllUsers();
         $this->load->view('templates/header');
         $this->load->view('edit_site', $data);
         $this->load->view('templates/footer');
@@ -66,64 +69,128 @@ class Site extends CI_Controller {
         redirect('site');
     }
 
-    public function config($id) {
-    // Ambil data site berdasarkan ID dari model
-    $data['site'] = $this->SiteModel->get_site_by_id($id);
-
-    // Tampilkan halaman konfigurasi
-    $this->load->view('templates/header');
-    $this->load->view('site/config_mrtg', $data);
-    $this->load->view('templates/footer');
-}
-
-
-      public function save_config($id) {
+    // Menampilkan halaman konfigurasi
+    public function config_mrtg($id) {
         $site = $this->SiteModel->get_site_by_id($id);
-        $username = $site['username'];
-        $role_id = $site['role_id']; // Dapatkan role_id dari tabel user
 
-        // Tentukan direktori berdasarkan role_id
-        if ($role_id == 3) { // Reseller
-            $directory = '/etc/site/reseller';
-        } elseif ($role_id == 2) { // User (POP)
-            $directory = '/etc/site/pop';
-        } else {
-            $this->session->set_flashdata('error', 'Invalid role for configuration.');
+        if (!$site) {
+            $this->session->set_flashdata('error', 'Site not found.');
             redirect('site');
             return;
         }
 
-        // Pastikan direktori ada atau buat jika belum ada
-        if (!is_dir($directory)) {
-            if (!mkdir($directory, 0755, true)) {
-                $this->session->set_flashdata('error', 'Failed to create directory.');
-                redirect('site');
-                return;
-            }
-        }
-
-        $config_content = "EnableIPv6: no\n";
-        $config_content .= "WorkDir: /var/www/html/{$role}/{$username}\n";
-        $config_content .= "Options[_]: growright,bits,transparent,nobanner,nolegend\n";
-        $config_content .= "Refresh: 300\n";
-        $config_content .= "Interval: 5\n";
-        $config_content .= "###############\n";
-        $config_content .= "Target[{$username}]: {$oid}:{$snmp_community}@{$ip_address}\n";
-        $config_content .= "MaxBytes[{$username}]: 100000000000\n";
-        $config_content .= "Title[{$username}]: {$username}\n";
-        $config_content .= "PageTop[{$username}]: <H1>{$username}</H1>\n";
-        $config_content .= "######\n";
-
-        $file_path = "{$directory}/{$username}.cfg";
-
-        // Tulis ke file konfigurasi
-        if (file_put_contents($file_path, $config_content) === false) {
-            $this->session->set_flashdata('error', 'Failed to create configuration file.');
-        } else {
-            $this->session->set_flashdata('success', 'Configuration file created successfully.');
-        }
-
-        redirect('site');
+        $data['site'] = $site;
+        $this->load->view('templates/header');
+        $this->load->view('site/config_mrtg', $data);
+        $this->load->view('templates/footer');
     }
+
+    // Generate atau save konfigurasi MRTG
+    public function generate_config($id) {
+    // Ambil data site berdasarkan ID
+    $site = $this->SiteModel->get_site_by_id($id);
+
+    if (!$site) {
+        $this->session->set_flashdata('error', 'Site not found.');
+        redirect('site');
+        return;
+    }
+
+    // Ambil detail konfigurasi
+    $username = $site['username'];
+    $role_id = $site['role_id'];
+    $oid = $site['oid'];
+    $snmp_community = $site['snmp_community'];
+    $ip_address = $site['ip_address'];
+    $graph = $site['graph'];
+
+    // Validasi data yang diperlukan
+    if (empty($oid) || empty($snmp_community) || empty($ip_address)) {
+        $this->session->set_flashdata('error', 'OID, SNMP Community, and IP Address are required.');
+        redirect('site/config_mrtg/' . $id);
+        return;
+    }
+
+    // Tentukan direktori penyimpanan file konfigurasi berdasarkan role
+    $directory = '';
+    if ($role_id == 3) { // Reseller
+        $directory = '/etc/site/reseller';
+    } elseif ($role_id == 2) { // POP
+        $directory = '/etc/site/pop';
+    } else {
+        $this->session->set_flashdata('error', 'Invalid role for configuration.');
+        redirect('site');
+        return;
+    }
+
+    // Konten file konfigurasi MRTG
+    $config_content = "EnableIPv6: no\n";
+    $config_content .= "WorkDir: /var/www/html{$graph}\n";
+    $config_content .= "Options[_]: growright,bits,transparent,nobanner,nolegend\n";
+    $config_content .= "Refresh: 300\n";
+    $config_content .= "Interval: 5\n";
+    $config_content .= "###############\n";
+    $config_content .= "Target[{$username}]: {$oid}:{$snmp_community}@{$ip_address}\n";
+    $config_content .= "MaxBytes[{$username}]: 100000000000\n";
+    $config_content .= "Title[{$username}]: {$username}\n";
+    $config_content .= "PageTop[{$username}]: <H1>{$username}</H1>\n";
+    $config_content .= "######\n";
+
+    // Tentukan path file konfigurasi
+    $file_path = "{$directory}/{$username}.cfg";
+    $command = "echo " . escapeshellarg($config_content) . " | sudo tee {$file_path} > /dev/null";
+    $output = shell_exec($command);
+
+    // Cek apakah file berhasil dibuat
+    if (file_exists($file_path)) {
+        $this->session->set_flashdata('success', 'Configuration file created successfully.');
+    } else {
+        error_log("Failed to create configuration file: " . $output);
+        $this->session->set_flashdata('error', 'Failed to create configuration file.');
+    }
+
+    // Kembali ke halaman konfigurasi dengan pesan flashdata
+    redirect('site/config_mrtg/' . $id);
+}
+public function create_folder($id) {
+    // Ambil data site berdasarkan ID
+    $site = $this->SiteModel->get_site_by_id($id);
+
+    if (!$site) {
+        $this->session->set_flashdata('error', 'Site not found.');
+        redirect('site/config_mrtg/' . $id);
+        return;
+    }
+
+    // Tentukan direktori berdasarkan role
+    $role_id = $site['role_id'];
+    $username = $site['username'];
+    $folder_path = "";
+
+    if ($role_id == 3) { // Reseller
+        $folder_path = "/var/www/html/reseller/{$username}";
+    } elseif ($role_id == 2) { // POP
+        $folder_path = "/var/www/html/pop/{$username}";
+    } else {
+        $this->session->set_flashdata('error', 'Invalid role for creating folder.');
+        redirect('site/config_mrtg/' . $id);
+        return;
+    }
+
+    // Buat folder dengan `mkdir` dan `sudo` tanpa meminta password
+    $command = "echo '' | sudo -S mkdir -p " . escapeshellarg($folder_path);
+    $output = shell_exec($command);
+
+    // Cek apakah folder berhasil dibuat
+    if (is_dir($folder_path)) {
+        $this->session->set_flashdata('success', 'Folder created successfully.');
+    } else {
+        error_log("Failed to create folder: " . $output);
+        $this->session->set_flashdata('error', 'Failed to create folder.');
+    }
+
+    // Kembali ke halaman konfigurasi dengan pesan flashdata
+    redirect('site/config_mrtg/' . $id);
+}
 
 }
