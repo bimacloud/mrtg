@@ -78,7 +78,7 @@
                                                 <a href="javascript:void(0);" onclick="loadIframe('<?php echo $site['graph']; ?>');" class="btn btn-info btn-sm"><i class="fa fa-bar-chart-o"></i> View</a>
                                                 <a href="<?php echo site_url('site/edit/'.$site['id']); ?>" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> Edit</a>
                                                 <a href="<?php echo site_url('site/delete/'.$site['id']); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i> Delete</a>
-                                                <a href="<?php echo site_url('site/generate_config/'.$site['id']); ?>" class="btn btn-default btn-sm"><i class="fa fa-cog"></i> Config</a>
+                                                <a href="<?php echo site_url('site/config_mrtg/'.$site['id']); ?>" class="btn btn-default btn-sm"><i class="fa fa-cog"></i> Config</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

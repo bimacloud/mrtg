@@ -95,15 +95,20 @@
                             <i class="fa fa-cog"></i> Generate Configuration File
                         </a>
                         
-                        <!-- Tombol Create Folder -->
                         <a href="<?php echo site_url('site/create_folder/' . $site['id']); ?>" class="btn btn-success">
                             <i class="fa fa-folder"></i> Create Folder
+                        </a>
+                        
+                        <!-- Tombol Generate Index -->
+                        <a href="<?php echo site_url('site/generate_index/' . $site['id']); ?>" class="btn btn-info">
+                            <i class="fa fa-file"></i> Generate Index
                         </a>
 
                         <a href="<?php echo site_url('site'); ?>" class="btn btn-default">
                             <i class="fa fa-arrow-left"></i> Back to Site Management
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>

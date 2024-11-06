@@ -87,110 +87,152 @@ class Site extends CI_Controller {
 
     // Generate atau save konfigurasi MRTG
     public function generate_config($id) {
-    // Ambil data site berdasarkan ID
-    $site = $this->SiteModel->get_site_by_id($id);
+        // Ambil data site berdasarkan ID
+        $site = $this->SiteModel->get_site_by_id($id);
 
-    if (!$site) {
-        $this->session->set_flashdata('error', 'Site not found.');
-        redirect('site');
-        return;
-    }
+        if (!$site) {
+            $this->session->set_flashdata('error', 'Site not found.');
+            redirect('site');
+            return;
+        }
 
-    // Ambil detail konfigurasi
-    $username = $site['username'];
-    $role_id = $site['role_id'];
-    $oid = $site['oid'];
-    $snmp_community = $site['snmp_community'];
-    $ip_address = $site['ip_address'];
-    $graph = $site['graph'];
+        // Ambil detail konfigurasi
+        $username = $site['username'];
+        $role_id = $site['role_id'];
+        $oid = $site['oid'];
+        $snmp_community = $site['snmp_community'];
+        $ip_address = $site['ip_address'];
+        $graph = $site['graph'];
 
-    // Validasi data yang diperlukan
-    if (empty($oid) || empty($snmp_community) || empty($ip_address)) {
-        $this->session->set_flashdata('error', 'OID, SNMP Community, and IP Address are required.');
+        // Validasi data yang diperlukan
+        if (empty($oid) || empty($snmp_community) || empty($ip_address)) {
+            $this->session->set_flashdata('error', 'OID, SNMP Community, and IP Address are required.');
+            redirect('site/config_mrtg/' . $id);
+            return;
+        }
+
+        // Tentukan direktori penyimpanan file konfigurasi berdasarkan role
+        $directory = '';
+        if ($role_id == 3) { // Reseller
+            $directory = '/etc/site/reseller';
+        } elseif ($role_id == 2) { // POP
+            $directory = '/etc/site/pop';
+        } else {
+            $this->session->set_flashdata('error', 'Invalid role for configuration.');
+            redirect('site');
+            return;
+        }
+
+        // Konten file konfigurasi MRTG
+        $config_content = "EnableIPv6: no\n";
+        $config_content .= "WorkDir: /var/www/html{$graph}\n";
+        $config_content .= "Options[_]: growright,bits,transparent,nobanner,nolegend\n";
+        $config_content .= "Refresh: 300\n";
+        $config_content .= "Interval: 5\n";
+        $config_content .= "###############\n";
+        $config_content .= "Target[{$username}]: {$oid}:{$snmp_community}@{$ip_address}\n";
+        $config_content .= "MaxBytes[{$username}]: 100000000000\n";
+        $config_content .= "Title[{$username}]: {$username}\n";
+        $config_content .= "PageTop[{$username}]: <H1>{$username}</H1>\n";
+        $config_content .= "######\n";
+
+        // Tentukan path file konfigurasi
+        $file_path = "{$directory}/{$username}.cfg";
+        $command = "echo " . escapeshellarg($config_content) . " | sudo tee {$file_path} > /dev/null";
+        $output = shell_exec($command);
+
+        // Cek apakah file berhasil dibuat
+        if (file_exists($file_path)) {
+            $this->session->set_flashdata('success', 'Configuration file created successfully.');
+        } else {
+            error_log("Failed to create configuration file: " . $output);
+            $this->session->set_flashdata('error', 'Failed to create configuration file.');
+        }
+
+        // Kembali ke halaman konfigurasi dengan pesan flashdata
         redirect('site/config_mrtg/' . $id);
-        return;
     }
+    public function create_folder($id) {
+        // Ambil data site berdasarkan ID
+        $site = $this->SiteModel->get_site_by_id($id);
 
-    // Tentukan direktori penyimpanan file konfigurasi berdasarkan role
-    $directory = '';
-    if ($role_id == 3) { // Reseller
-        $directory = '/etc/site/reseller';
-    } elseif ($role_id == 2) { // POP
-        $directory = '/etc/site/pop';
-    } else {
-        $this->session->set_flashdata('error', 'Invalid role for configuration.');
-        redirect('site');
-        return;
-    }
+        if (!$site) {
+            $this->session->set_flashdata('error', 'Site not found.');
+            redirect('site/config_mrtg/' . $id);
+            return;
+        }
 
-    // Konten file konfigurasi MRTG
-    $config_content = "EnableIPv6: no\n";
-    $config_content .= "WorkDir: /var/www/html{$graph}\n";
-    $config_content .= "Options[_]: growright,bits,transparent,nobanner,nolegend\n";
-    $config_content .= "Refresh: 300\n";
-    $config_content .= "Interval: 5\n";
-    $config_content .= "###############\n";
-    $config_content .= "Target[{$username}]: {$oid}:{$snmp_community}@{$ip_address}\n";
-    $config_content .= "MaxBytes[{$username}]: 100000000000\n";
-    $config_content .= "Title[{$username}]: {$username}\n";
-    $config_content .= "PageTop[{$username}]: <H1>{$username}</H1>\n";
-    $config_content .= "######\n";
+        // Tentukan direktori berdasarkan role
+        $role_id = $site['role_id'];
+        $username = $site['username'];
+        $folder_path = "";
 
-    // Tentukan path file konfigurasi
-    $file_path = "{$directory}/{$username}.cfg";
-    $command = "echo " . escapeshellarg($config_content) . " | sudo tee {$file_path} > /dev/null";
-    $output = shell_exec($command);
+        if ($role_id == 3) { // Reseller
+            $folder_path = "/var/www/html/reseller/{$username}";
+        } elseif ($role_id == 2) { // POP
+            $folder_path = "/var/www/html/pop/{$username}";
+        } else {
+            $this->session->set_flashdata('error', 'Invalid role for creating folder.');
+            redirect('site/config_mrtg/' . $id);
+            return;
+        }
 
-    // Cek apakah file berhasil dibuat
-    if (file_exists($file_path)) {
-        $this->session->set_flashdata('success', 'Configuration file created successfully.');
-    } else {
-        error_log("Failed to create configuration file: " . $output);
-        $this->session->set_flashdata('error', 'Failed to create configuration file.');
-    }
+        // Buat folder dengan `mkdir` dan `sudo` tanpa meminta password
+        $command = "echo '' | sudo -S mkdir -p " . escapeshellarg($folder_path);
+        $output = shell_exec($command);
 
-    // Kembali ke halaman konfigurasi dengan pesan flashdata
-    redirect('site/config_mrtg/' . $id);
-}
-public function create_folder($id) {
-    // Ambil data site berdasarkan ID
-    $site = $this->SiteModel->get_site_by_id($id);
+        // Cek apakah folder berhasil dibuat
+        if (is_dir($folder_path)) {
+            $this->session->set_flashdata('success', 'Folder created successfully.');
+        } else {
+            error_log("Failed to create folder: " . $output);
+            $this->session->set_flashdata('error', 'Failed to create folder.');
+        }
 
-    if (!$site) {
-        $this->session->set_flashdata('error', 'Site not found.');
+        // Kembali ke halaman konfigurasi dengan pesan flashdata
         redirect('site/config_mrtg/' . $id);
-        return;
     }
+    public function generate_index($id) {
+        // Ambil data site berdasarkan ID
+        $site = $this->SiteModel->get_site_by_id($id);
 
-    // Tentukan direktori berdasarkan role
-    $role_id = $site['role_id'];
-    $username = $site['username'];
-    $folder_path = "";
+        if (!$site) {
+            $this->session->set_flashdata('error', 'Site not found.');
+            redirect('site/config_mrtg/' . $id);
+            return;
+        }
 
-    if ($role_id == 3) { // Reseller
-        $folder_path = "/var/www/html/reseller/{$username}";
-    } elseif ($role_id == 2) { // POP
-        $folder_path = "/var/www/html/pop/{$username}";
-    } else {
-        $this->session->set_flashdata('error', 'Invalid role for creating folder.');
+        // Tentukan direktori output dan path file konfigurasi
+        $username = $site['username'];
+        $role_id = $site['role_id'];
+        $config_path = "/etc/site/{$username}.cfg";
+        $output_directory = "";
+
+        if ($role_id == 3) { // Reseller
+            $output_directory = "/var/www/html/reseller/{$username}";
+        } elseif ($role_id == 2) { // POP
+            $output_directory = "/var/www/html/pop/{$username}";
+        } else {
+            $this->session->set_flashdata('error', 'Invalid role for index generation.');
+            redirect('site/config_mrtg/' . $id);
+            return;
+        }
+
+        // Perintah untuk menjalankan indexmaker dan menyimpan output ke index.html
+        $command = "sudo indexmaker " . escapeshellarg($config_path) . " > " . escapeshellarg("{$output_directory}/index.html");
+        $output = shell_exec($command);
+
+        // Cek apakah file index.html berhasil dibuat
+        if (file_exists("{$output_directory}/index.html")) {
+            $this->session->set_flashdata('success', 'Index file created successfully.');
+        } else {
+            error_log("Failed to create index file: " . $output);
+            $this->session->set_flashdata('error', 'Failed to create index file.');
+        }
+
+        // Kembali ke halaman konfigurasi dengan pesan flashdata
         redirect('site/config_mrtg/' . $id);
-        return;
     }
 
-    // Buat folder dengan `mkdir` dan `sudo` tanpa meminta password
-    $command = "echo '' | sudo -S mkdir -p " . escapeshellarg($folder_path);
-    $output = shell_exec($command);
-
-    // Cek apakah folder berhasil dibuat
-    if (is_dir($folder_path)) {
-        $this->session->set_flashdata('success', 'Folder created successfully.');
-    } else {
-        error_log("Failed to create folder: " . $output);
-        $this->session->set_flashdata('error', 'Failed to create folder.');
-    }
-
-    // Kembali ke halaman konfigurasi dengan pesan flashdata
-    redirect('site/config_mrtg/' . $id);
-}
 
 }
