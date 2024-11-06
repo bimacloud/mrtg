@@ -271,10 +271,12 @@ class Site extends CI_Controller {
     }
 
     // Perintah untuk menjalankan MRTG dengan sudo
-    $command = "sudo env LANG=C /usr/bin/mrtg " . escapeshellarg($config_path) . " 2>&1";
+    $command = "sudo /usr/bin/mrtg " . escapeshellarg($config_path) . " 2>&1";
     $output = shell_exec($command);
 
     // Debugging output
+    error_log("MRTG run output: " . $output);
+
     if (strpos($output, 'ERROR') === false) {
         $this->session->set_flashdata('success', 'MRTG ran successfully.');
     } else {
