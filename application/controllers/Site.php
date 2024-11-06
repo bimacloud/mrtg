@@ -270,7 +270,7 @@ public function run_mrtg($id) {
     }
 
     // Perintah untuk menjalankan MRTG
-    $command = "env LANG=C mrtg " . escapeshellarg($config_path) . " 2>&1";
+    $command = "sudo env LANG=C mrtg " . escapeshellarg($config_path) . " 2>&1";
     $output = shell_exec($command);
 
     // Debugging output
