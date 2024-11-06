@@ -244,7 +244,8 @@ class Site extends CI_Controller {
         // Kembali ke halaman konfigurasi dengan pesan flashdata
         redirect('site/config_mrtg/' . $id);
     }
-public function run_mrtg($id) {
+
+    public function run_mrtg($id) {
     // Ambil data site berdasarkan ID
     $site = $this->SiteModel->get_site_by_id($id);
 
@@ -269,8 +270,8 @@ public function run_mrtg($id) {
         return;
     }
 
-    // Perintah untuk menjalankan MRTG
-    $command = "sudo env LANG=C mrtg " . escapeshellarg($config_path) . " 2>&1";
+    // Perintah untuk menjalankan MRTG dengan sudo
+    $command = "sudo env LANG=C /usr/bin/mrtg " . escapeshellarg($config_path) . " 2>&1";
     $output = shell_exec($command);
 
     // Debugging output
