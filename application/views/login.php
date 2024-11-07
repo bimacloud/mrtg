@@ -13,9 +13,16 @@
         body, html {
             height: 100%;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: #f0f2f5;
+        }
+        .header-text {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
         }
         .login-container {
             width: 100%;
@@ -62,9 +69,24 @@
         .login-button:hover {
             background-color: #45a049;
         }
+        .footer-text {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        .footer-text a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+
+<div class="header-text">PuskoNet MRTG</div>
 
 <div class="login-container">
     <h1>Login</h1>
@@ -86,6 +108,11 @@
 
         <button type="submit" class="login-button">Login</button>
     </form>
+</div>
+
+<div class="footer-text">
+    2024 © puskonet -
+    <a href="https://www.puskomedia.net.id" target="_blank"> PT Puskomedia Indonesia Kreatif</a>
 </div>
 
 </body>
