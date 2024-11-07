@@ -18,19 +18,18 @@ class Auth extends CI_Controller {
         $username = $this->input->post('username');
         $password = $this->input->post('password');
 
-        // Proses autentikasi
         $user = $this->UserModel->login($username, $password);
 
         if ($user) {
-            // Set session data
+            // Set sesi pengguna
             $this->session->set_userdata('user_id', $user['id']);
             $this->session->set_userdata('username', $user['username']);
             $this->session->set_userdata('role', $user['role_name']);
+            $this->session->set_userdata('role_id', $user['role_id']); // Simpan role_id di sesi
 
             // Redirect ke dashboard
             redirect('dashboard');
         } else {
-            // Jika login gagal, tampilkan pesan error
             $this->session->set_flashdata('error', 'Invalid username or password');
             redirect('auth/login');
         }

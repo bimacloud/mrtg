@@ -7,11 +7,28 @@ class Site extends CI_Controller {
         parent::__construct();
         $this->load->model('SiteModel');
         $this->load->model('UserModel'); // Untuk mengambil data user
+        $this->load->library('session'); // Memastikan library session dimuat
+        $this->load->model('RoleModel'); // Muat RoleModel
+
+        // Memeriksa apakah pengguna sudah login
+        if (!$this->session->userdata('user_id')) {
+            redirect('auth/login'); // Redirect ke halaman login jika belum login
+        }
     }
 
     // Menampilkan semua site
     public function index() {
-        $data['sites'] = $this->SiteModel->getAllSites();
+        // Memeriksa peran pengguna
+        $user_id = $this->session->userdata('user_id');
+        $role_id = $this->session->userdata('role_id');
+
+        if ($role_id == 1) { // Jika admin
+            $data['sites'] = $this->SiteModel->getAllSites();
+        } else {
+            // Jika bukan admin, ambil hanya site yang sesuai dengan user_id
+            $data['sites'] = $this->SiteModel->getSitesByUserId($user_id);
+        }
+
         $this->load->view('templates/header', $data);
         $this->load->view('list_sites', $data);
         $this->load->view('templates/footer');

@@ -3,20 +3,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class SiteModel extends CI_Model {
 
-     public function __construct() {
+    public function __construct() {
         parent::__construct();
         $this->load->database(); // Pastikan database telah di-load
     }
 
     public function getAllSites() {
-        $this->db->select('site.*, user.username');
+        $this->db->select('site.*, user.username'); // Ganti 'users' menjadi 'user'
         $this->db->from('site');
-        $this->db->join('user', 'site.user_id = user.id'); // Bergabung dengan tabel user
+        $this->db->join('user', 'site.user_id = user.id', 'left'); // Ganti 'users' menjadi 'user'
         return $this->db->get()->result_array();
     }
 
     public function getSiteById($id) {
-        return $this->db->get_where('site', array('id' => $id))->row_array();
+        $this->db->select('site.*, user.role_id, user.username'); // Ganti 'users' menjadi 'user'
+        $this->db->from('site');
+        $this->db->join('user', 'site.user_id = user.id', 'left'); // Ganti 'users' menjadi 'user'
+        $this->db->where('site.id', $id);
+        return $this->db->get()->row_array();
     }
 
     public function saveSite($data) {
@@ -32,15 +36,12 @@ class SiteModel extends CI_Model {
         $this->db->where('id', $id);
         return $this->db->delete('site');
     }
-    public function get_site_by_id($id) {
-        $this->db->select('site.*, user.role_id, user.username'); // Ambil kolom role_id dan username dari tabel user
+
+    public function getSitesByUserId($user_id) {
+        $this->db->select('site.*, user.username'); // Ganti 'users' menjadi 'user'
         $this->db->from('site');
-        $this->db->join('user', 'site.user_id = user.id', 'left'); // Join dengan tabel user
-        $this->db->where('site.id', $id);
-        $query = $this->db->get();
-
-        return $query->row_array();
+        $this->db->join('user', 'site.user_id = user.id', 'left'); // Ganti 'users' menjadi 'user'
+        $this->db->where('site.user_id', $user_id);
+        return $this->db->get()->result_array();
     }
-
-
 }

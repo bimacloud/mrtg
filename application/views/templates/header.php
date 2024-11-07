@@ -150,30 +150,39 @@
                 </li>
             </ul>
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-            <div class="collapse navbar-collapse navbar-ex1-collapse">
-                <ul class="nav navbar-nav side-nav">
-                    <li class="active">
-                        <a href="<?php echo site_url('dashboard'); ?>"><i class="fa fa-fw fa-home"></i> Home</a>
-                    </li>
-                    <li>
-                        <a href="<?php echo site_url('site'); ?>"><i class="fa fa-fw fa-map"></i> Site</a>
-                    </li>
-                    <li>
-                        <a href="javascript:;" data-toggle="collapse" data-target="#graphMenu"><i class="fa fa-fw fa-bar-chart-o"></i> Graph <i class="fa fa-fw fa-caret-down"></i></a>
-                        <ul id="graphMenu" class="collapse">
-                            <li>
-                                <a href="<?php echo site_url('graph/list'); ?>"><i class="fa fa-fw fa-list"></i> List Graph</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="<?php echo site_url('user'); ?>"><i class="fa fa-fw fa-user"></i> User</a>
-                    </li>
-                    <li>
-                        <a href="<?php echo site_url('role'); ?>"><i class="fa fa-fw fa-lock"></i> Role</a>
-                    </li>
-                </ul>
-            </div>
+            <<div id="sidebar">
+                    <ul class="nav navbar-nav side-nav">
+                        <li class="active">
+                            <a href="<?php echo site_url('dashboard'); ?>"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
+                        </li>
+                        <?php
+                        $role_id = $this->session->userdata('role_id'); // Ambil role_id dari sesi
+                        $access = $this->RoleModel->getRoleAccess($role_id); // Ambil akses menu untuk role ini
+                        $allowed_menus = array_column($access, 'menu_name'); // Ambil daftar menu yang diizinkan
+                        
+                        // Cek dan tampilkan menu Site jika diizinkan
+                        if (in_array('Site', $allowed_menus)) {
+                            echo '<li><a href="' . site_url('site') . '"><i class="fa fa-fw fa-table"></i> Site</a></li>';
+                        }
+
+                        // Cek dan tampilkan menu Graph jika diizinkan
+                        if (in_array('Graph', $allowed_menus)) {
+                            echo '<li><a href="' . site_url('graph') . '"><i class="fa fa-fw fa-bar-chart-o"></i> Graph</a></li>';
+                        }
+
+                        // Cek dan tampilkan menu User jika diizinkan
+                        if (in_array('User', $allowed_menus)) {
+                            echo '<li><a href="' . site_url('user') . '"><i class="fa fa-fw fa-user"></i> User</a></li>';
+                        }
+
+                        // Cek dan tampilkan menu Role jika diizinkan
+                        if (in_array('Role', $allowed_menus)) {
+                            echo '<li><a href="' . site_url('role') . '"><i class="fa fa-fw fa-lock"></i> Role</a></li>';
+                        }
+                        ?>
+                    </ul>
+                </div>
+
 
             <!-- /.navbar-collapse -->
         </nav>

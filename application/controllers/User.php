@@ -7,6 +7,11 @@ class User extends CI_Controller {
         parent::__construct();
         $this->load->model('UserModel');
         $this->load->model('RoleModel');
+
+           // Periksa apakah pengguna sudah login
+        if (!$this->session->userdata('user_id')) {
+            redirect('auth/login'); // Redirect ke halaman login jika belum login
+        }
     }
 
     // Menampilkan semua pengguna

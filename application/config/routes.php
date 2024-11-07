@@ -69,6 +69,8 @@ $route['role/save'] = 'Role/save';
 $route['role/edit/(:num)'] = 'Role/edit/$1';
 $route['role/update/(:num)'] = 'Role/update/$1';
 $route['role/delete/(:num)'] = 'Role/delete/$1';
+$route['role/access/(:num)'] = 'role/access/$1';
+
 
 $route['login'] = 'auth/login';
 $route['logout'] = 'auth/logout';
