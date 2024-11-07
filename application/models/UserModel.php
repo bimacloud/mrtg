@@ -42,4 +42,15 @@ class UserModel extends CI_Model {
         }
         return false;
     }
+
+       public function sendVerificationCode($chat_id, $code) {
+        $token = "7431174701:AAFdWYf1W6dKLRV25c0aSHu2sFwNW4iXdeA"; // Token bot Telegram Anda
+        $message = "Your verification code is: " . $code;
+        file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?chat_id={$chat_id}&text=" . urlencode($message));
+    }
+
+        public function updateTelegram($user_id, $chat_id) {
+        $this->db->where('id', $user_id); // Cari pengguna berdasarkan user_id
+        return $this->db->update('user', ['chat_id' => $chat_id]); // Perbarui chat_id di tabel user
+    }
 }

@@ -50,7 +50,9 @@
                         <h3 class="panel-title"><i class="fa fa-table fa-fw"></i> List of Sites</h3>
                     </div>
                     <div class="panel-body">
+                        <?php if ($this->session->userdata('role_id') == 1): // Cek apakah role_id adalah admin ?>
                         <a href="<?php echo site_url('site/create'); ?>" class="btn btn-primary">Create New Site</a>
+                        <?php endif; ?>
                         <br><br>
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover">
@@ -76,10 +78,13 @@
                                             <td><?php echo $site['vlan_id']; ?></td>
                                             <td>
                                                 <a href="javascript:void(0);" onclick="loadIframe('<?php echo $site['graph']; ?>');" class="btn btn-info btn-sm"><i class="fa fa-bar-chart-o"></i> View</a>
-                                                <a href="<?php echo site_url('site/edit/'.$site['id']); ?>" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> Edit</a>
-                                                <a href="<?php echo site_url('site/delete/'.$site['id']); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i> Delete</a>
-                                                <a href="<?php echo site_url('site/config_mrtg/'.$site['id']); ?>" class="btn btn-default btn-sm"><i class="fa fa-cog"></i> Config</a>
+                                                <?php if ($this->session->userdata('role_id') == 1): // Cek apakah role_id adalah admin ?>
+                                                    <a href="<?php echo site_url('site/edit/'.$site['id']); ?>" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> Edit</a>
+                                                    <a href="<?php echo site_url('site/delete/'.$site['id']); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i> Delete</a>
+                                                    <a href="<?php echo site_url('site/config_mrtg/'.$site['id']); ?>" class="btn btn-default btn-sm"><i class="fa fa-cog"></i> Config</a>
+                                                <?php endif; ?>
                                             </td>
+
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

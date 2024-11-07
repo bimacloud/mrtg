@@ -60,14 +60,14 @@
             padding: 10px;
             border: none;
             border-radius: 4px;
-            background-color: #4CAF50;
+            background-color: #4561c3;
             color: #fff;
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
         .login-button:hover {
-            background-color: #45a049;
+            background-color: #2f56dd;
         }
         .footer-text {
             margin-top: 20px;
