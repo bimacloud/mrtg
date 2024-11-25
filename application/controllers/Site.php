@@ -88,7 +88,7 @@ class Site extends CI_Controller {
 
     // Menampilkan halaman konfigurasi
     public function config_mrtg($id) {
-        $site = $this->SiteModel->get_site_by_id($id);
+        $site = $this->SiteModel->getSiteById($id);
 
         if (!$site) {
             $this->session->set_flashdata('error', 'Site not found.');
@@ -105,7 +105,7 @@ class Site extends CI_Controller {
     // Generate atau save konfigurasi MRTG
     public function generate_config($id) {
         // Ambil data site berdasarkan ID
-        $site = $this->SiteModel->get_site_by_id($id);
+        $site = $this->SiteModel->getSiteById($id);
 
         if (!$site) {
             $this->session->set_flashdata('error', 'Site not found.');
@@ -171,7 +171,7 @@ class Site extends CI_Controller {
     }
     public function create_folder($id) {
         // Ambil data site berdasarkan ID
-        $site = $this->SiteModel->get_site_by_id($id);
+        $site = $this->SiteModel->getSiteById($id);
 
         if (!$site) {
             $this->session->set_flashdata('error', 'Site not found.');
@@ -211,7 +211,7 @@ class Site extends CI_Controller {
     }
     public function generate_index($id) {
         // Ambil data site berdasarkan ID
-        $site = $this->SiteModel->get_site_by_id($id);
+        $site = $this->SiteModel->getSiteById($id);
 
         if (!$site) {
             $this->session->set_flashdata('error', 'Site not found.');
@@ -264,7 +264,7 @@ class Site extends CI_Controller {
 
     public function run_mrtg($id) {
     // Ambil data site berdasarkan ID
-    $site = $this->SiteModel->get_site_by_id($id);
+    $site = $this->SiteModel->getSiteById($id);
 
     if (!$site) {
         $this->session->set_flashdata('error', 'Site not found.');
